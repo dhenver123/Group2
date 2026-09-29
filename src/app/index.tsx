@@ -5,11 +5,10 @@ import { useRouter } from 'expo-router';
 export default function ProfileScreen() {
   const router = useRouter();
 
-  // Lesson 3: User Inputs State
-  const [name, setName] = useState('Alex Developer');
-  const [section, setSection] = useState('C'); // Default section 'C' -> initial value 3
 
-  // Helper to convert section letter to number (A=1, B=2, C=3...)
+  const [name, setName] = useState('Alex Developer');
+  const [section, setSection] = useState('C');
+
   const getSectionValue = (letter: string) => {
     const charCode = letter.toUpperCase().charCodeAt(0);
     return charCode >= 65 && charCode <= 90 ? charCode - 64 : 1;
@@ -17,17 +16,15 @@ export default function ProfileScreen() {
 
   const initialCount = getSectionValue(section);
 
-  // Lesson 2: useState for Counter
   const [count, setCount] = useState(initialCount);
 
-  // Update section letter and reset counter
+
   const handleSectionChange = (text: string) => {
     setSection(text);
     const newInitial = getSectionValue(text);
     setCount(newInitial);
   };
 
-  // Lesson 4 & 5: Navigation and Data Passing
   const handleNavigate = () => {
     router.push({
       pathname: '/dashboard',
@@ -37,7 +34,7 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Lesson 1: Styled View & Text (About Myself) */}
+      {}
       <View style={styles.card}>
         <Text style={styles.avatar}>🧑‍💻</Text>
         <Text style={styles.title}>About Myself</Text>
@@ -47,7 +44,7 @@ export default function ProfileScreen() {
         </Text>
       </View>
 
-      {/* Lesson 3: Interactive Inputs */}
+      {}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Student Name:</Text>
         <TextInput
@@ -67,7 +64,7 @@ export default function ProfileScreen() {
         />
       </View>
 
-      {/* Lesson 2: Interactive Counter */}
+      {}
       <View style={styles.counterCard}>
         <Text style={styles.counterTitle}>Study Target Counter</Text>
         <Text style={styles.counterValue}>{count}</Text>
@@ -88,7 +85,7 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      {/* Lesson 4 & 5 Trigger */}
+      {}
       <TouchableOpacity style={styles.navButton} onPress={handleNavigate}>
         <Text style={styles.navButtonText}>Go to Dashboard ➔</Text>
       </TouchableOpacity>
