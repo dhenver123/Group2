@@ -5,11 +5,10 @@ import { useRouter } from 'expo-router';
 export default function AthleteProfileScreen() {
   const router = useRouter();
 
-  // Lesson 3: User Inputs State
-  const [athleteName, setAthleteName] = useState('Alex Trainer');
-  const [workoutType, setWorkoutType] = useState('CHEST'); // Default workout target
+  const [athleteName, setAthleteName] = useState('Your Name');
+  const [workoutType, setWorkoutType] = useState('CHEST');
 
-  // Helper: Derive initial target sets based on workout complexity/type
+
   const getWorkoutBaseSets = (type: string) => {
     const cleanType = type.trim().toUpperCase();
     if (cleanType.includes('ABS')) return 3;
@@ -21,17 +20,16 @@ export default function AthleteProfileScreen() {
 
   const initialSets = getWorkoutBaseSets(workoutType);
 
-  // Lesson 2: useState for Set Counter
+
   const [sets, setSets] = useState(initialSets);
 
-  // Handle Target Workout Input Change & recalculate base target sets
   const handleWorkoutChange = (text: string) => {
     setWorkoutType(text);
     const newInitial = getWorkoutBaseSets(text);
     setSets(newInitial);
   };
 
-  // Lesson 4 & 5: Navigation with Parameters
+
   const handleNavigate = () => {
     router.push({
       pathname: '/(tabs)/dashboard' as any,
@@ -41,17 +39,17 @@ export default function AthleteProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Lesson 1: Styled View & Text (About Myself / Athlete Card) */}
+      {}
       <View style={styles.card}>
         <Text style={styles.avatar}>🏋️‍♂️</Text>
         <Text style={styles.title}>About The Athlete</Text>
         <Text style={styles.subtitle}>Fitness & Mobile Tech Student</Text>
         <Text style={styles.bio}>
-          Dedicated to tracking fitness gains in the gym and progress in React Native application development!
+          Dedicated to tracking fitness gains in the gym and progress!
         </Text>
       </View>
 
-      {/* Lesson 3: Interactive Text Inputs */}
+      {}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Athlete Name:</Text>
         <TextInput
@@ -73,7 +71,7 @@ export default function AthleteProfileScreen() {
         />
       </View>
 
-      {/* Lesson 2: Counter State for Target Sets */}
+      {}
       <View style={styles.counterCard}>
         <Text style={styles.counterTitle}>Target Sets ({workoutType.toUpperCase()})</Text>
         <Text style={styles.counterValue}>{sets}</Text>
@@ -99,7 +97,7 @@ export default function AthleteProfileScreen() {
         </View>
       </View>
 
-      {/* Lesson 4 & 5 Trigger */}
+      {}
       <TouchableOpacity style={styles.navButton} onPress={handleNavigate}>
         <Text style={styles.navButtonText}>Go to Workout Dashboard ➔</Text>
       </TouchableOpacity>
