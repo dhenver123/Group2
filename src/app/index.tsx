@@ -2,33 +2,40 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 
-export default function ProfileScreen() {
+export default function AthleteProfileScreen() {
   const router = useRouter();
 
+  // Lesson 3: User Inputs State
+  const [athleteName, setAthleteName] = useState('Alex Trainer');
+  const [workoutType, setWorkoutType] = useState('CHEST'); // Default workout target
 
-  const [name, setName] = useState('Alex Developer');
-  const [section, setSection] = useState('C');
-
-  const getSectionValue = (letter: string) => {
-    const charCode = letter.toUpperCase().charCodeAt(0);
-    return charCode >= 65 && charCode <= 90 ? charCode - 64 : 1;
+  // Helper: Derive initial target sets based on workout complexity/type
+  const getWorkoutBaseSets = (type: string) => {
+    const cleanType = type.trim().toUpperCase();
+    if (cleanType.includes('ABS')) return 3;
+    if (cleanType.includes('ARMS')) return 4;
+    if (cleanType.includes('CHEST')) return 5;
+    if (cleanType.includes('LEGS')) return 6;
+    return cleanType.length > 0 ? Math.min(Math.max(cleanType.length, 3), 8) : 4;
   };
 
-  const initialCount = getSectionValue(section);
+  const initialSets = getWorkoutBaseSets(workoutType);
 
-  const [count, setCount] = useState(initialCount);
+  // Lesson 2: useState for Set Counter
+  const [sets, setSets] = useState(initialSets);
 
-
-  const handleSectionChange = (text: string) => {
-    setSection(text);
-    const newInitial = getSectionValue(text);
-    setCount(newInitial);
+  // Handle Target Workout Input Change & recalculate base target sets
+  const handleWorkoutChange = (text: string) => {
+    setWorkoutType(text);
+    const newInitial = getWorkoutBaseSets(text);
+    setSets(newInitial);
   };
 
+  // Lesson 4 & 5: Navigation with Parameters
   const handleNavigate = () => {
     router.push({
-      pathname: '/dashboard',
-      params: { name, section, count, initialCount },
+      pathname: '/(tabs)/dashboard' as any,
+      params: { athleteName, workoutType, sets, initialSets },
     });
   };
 
