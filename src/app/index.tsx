@@ -1,130 +1,197 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
+import { router } from "expo-router";
 
-export default function AthleteProfileScreen() {
-  const router = useRouter();
+import Header from "../components/Header";
+import CustomButton from "../components/CustomButton";
+import Colors from "../constants/Colors";
+import { useMissions } from "../context/MissionContext";
 
-  const [athleteName, setAthleteName] = useState('Your Name');
-  const [workoutType, setWorkoutType] = useState('CHEST');
+export default function HomeScreen() {
+  const {
+    studentName,
+    setStudentName,
+    totalMissions,
+    completedMissions,
+  } = useMissions();
 
+  const [nameInput, setNameInput] = useState(
+    studentName === "Student" ? "" : studentName
+  );
 
-  const getWorkoutBaseSets = (type: string) => {
-    const cleanType = type.trim().toUpperCase();
-    if (cleanType.includes('ABS')) return 3;
-    if (cleanType.includes('ARMS')) return 4;
-    if (cleanType.includes('CHEST')) return 5;
-    if (cleanType.includes('LEGS')) return 6;
-    return cleanType.length > 0 ? Math.min(Math.max(cleanType.length, 3), 8) : 4;
-  };
+  const startStudyDay = () => {
+    const trimmedName = nameInput.trim();
 
-  const initialSets = getWorkoutBaseSets(workoutType);
+    if (trimmedName.length > 0) {
+      setStudentName(trimmedName);
+    }
 
-
-  const [sets, setSets] = useState(initialSets);
-
-  const handleWorkoutChange = (text: string) => {
-    setWorkoutType(text);
-    const newInitial = getWorkoutBaseSets(text);
-    setSets(newInitial);
-  };
-
-
-  const handleNavigate = () => {
-    router.push({
-      pathname: '/(tabs)/dashboard' as any,
-      params: { athleteName, workoutType, sets, initialSets },
-    });
+    router.push("/tasks");
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {}
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.hero}>
+        <Text style={styles.emoji}>📚</Text>
+
+        <Text style={styles.title}>
+          Student Daily Mission
+        </Text>
+
+        <Text style={styles.subtitle}>
+          Organize your study day, complete your missions,
+          and track your progress.
+        </Text>
+      </View>
+
       <View style={styles.card}>
-        <Text style={styles.avatar}>🏋️‍♂️</Text>
-        <Text style={styles.title}>About The Athlete</Text>
-        <Text style={styles.subtitle}>Fitness & Mobile Tech Student</Text>
-        <Text style={styles.bio}>
-          Dedicated to tracking fitness gains in the gym and progress!
-        </Text>
-      </View>
-
-      {}
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Athlete Name:</Text>
-        <TextInput
-          style={styles.input}
-          value={athleteName}
-          onChangeText={setAthleteName}
-          placeholder="Enter athlete name"
-          placeholderTextColor="#64748B"
+        <Header
+          title="Welcome!"
+          subtitle="Enter your name to begin your study day."
         />
 
-        <Text style={styles.label}>Target Workout (ARMS, ABS, CHEST...):</Text>
+        <Text style={styles.label}>Your Name</Text>
+
         <TextInput
+          value={nameInput}
+          onChangeText={setNameInput}
+          placeholder="Enter your name"
+          placeholderTextColor={Colors.textLight}
           style={styles.input}
-          value={workoutType}
-          onChangeText={handleWorkoutChange}
-          placeholder="e.g. Arms, Abs, Chest, Legs"
-          placeholderTextColor="#64748B"
-          autoCapitalize="characters"
+        />
+
+        <CustomButton
+          title="Start My Study Day"
+          onPress={startStudyDay}
         />
       </View>
 
-      {}
-      <View style={styles.counterCard}>
-        <Text style={styles.counterTitle}>Target Sets ({workoutType.toUpperCase()})</Text>
-        <Text style={styles.counterValue}>{sets}</Text>
-        <Text style={styles.initialText}>
-          (Base Sets for '{workoutType.toUpperCase()}': {initialSets})
-        </Text>
+      <View style={styles.statsContainer}>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>
+            {totalMissions}
+          </Text>
+          <Text style={styles.statLabel}>Missions</Text>
+        </View>
 
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={[styles.btn, styles.addBtn]} onPress={() => setSets(sets + 1)}>
-            <Text style={styles.btnText}>+1</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.btn, styles.subBtn]}
-            onPress={() => setSets(Math.max(1, sets - 1))}
-          >
-            <Text style={styles.btnText}>-1</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.btn, styles.resetBtn]} onPress={() => setSets(initialSets)}>
-            <Text style={styles.btnText}>Reset</Text>
-          </TouchableOpacity>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>
+            {completedMissions}
+          </Text>
+          <Text style={styles.statLabel}>Completed</Text>
         </View>
       </View>
 
-      {}
-      <TouchableOpacity style={styles.navButton} onPress={handleNavigate}>
-        <Text style={styles.navButtonText}>Go to Workout Dashboard ➔</Text>
-      </TouchableOpacity>
+      <CustomButton
+        title="My Profile"
+        variant="secondary"
+        onPress={() => router.push("/profile")}
+      />
+
+      <CustomButton
+        title="Daily Study Tips"
+        variant="secondary"
+        onPress={() => router.push("/tips")}
+      />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20, backgroundColor: '#0F172A' },
-  card: { backgroundColor: '#1E293B', padding: 20, borderRadius: 16, alignItems: 'center', marginBottom: 20, elevation: 4 },
-  avatar: { fontSize: 50, marginBottom: 10 },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#38BDF8' },
-  subtitle: { fontSize: 14, color: '#94A3B8', marginBottom: 10 },
-  bio: { textAlign: 'center', color: '#CBD5E1', lineHeight: 20 },
-  inputContainer: { backgroundColor: '#1E293B', padding: 16, borderRadius: 16, marginBottom: 20, elevation: 3 },
-  label: { fontSize: 14, fontWeight: '600', color: '#94A3B8', marginBottom: 6 },
-  input: { borderWidth: 1, borderColor: '#334155', borderRadius: 8, padding: 10, color: '#F8FAFC', backgroundColor: '#0F172A', marginBottom: 12 },
-  counterCard: { backgroundColor: '#1E293B', padding: 20, borderRadius: 16, alignItems: 'center', marginBottom: 20, elevation: 4 },
-  counterTitle: { fontSize: 16, fontWeight: '600', color: '#94A3B8' },
-  counterValue: { fontSize: 48, fontWeight: 'bold', color: '#38BDF8', marginVertical: 10 },
-  initialText: { fontSize: 12, color: '#64748B', marginBottom: 16 },
-  buttonRow: { flexDirection: 'row', gap: 10 },
-  btn: { paddingVertical: 10, paddingHorizontal: 20, borderRadius: 8 },
-  addBtn: { backgroundColor: '#10B981' },
-  subBtn: { backgroundColor: '#EF4444' },
-  resetBtn: { backgroundColor: '#64748B' },
-  btnText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16 },
-  navButton: { backgroundColor: '#0284C7', padding: 16, borderRadius: 12, alignItems: 'center' },
-  navButtonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 16 },
+  container: {
+    flexGrow: 1,
+    backgroundColor: Colors.background,
+    padding: 20,
+    paddingTop: 60,
+  },
+
+  hero: {
+    alignItems: "center",
+    marginBottom: 30,
+  },
+
+  emoji: {
+    fontSize: 56,
+    marginBottom: 12,
+  },
+
+  title: {
+    fontSize: 30,
+    fontWeight: "800",
+    color: Colors.text,
+    textAlign: "center",
+  },
+
+  subtitle: {
+    fontSize: 16,
+    color: Colors.textLight,
+    textAlign: "center",
+    lineHeight: 24,
+    marginTop: 10,
+  },
+
+  card: {
+    backgroundColor: Colors.card,
+    borderRadius: 18,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginBottom: 18,
+  },
+
+  label: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: Colors.text,
+    marginBottom: 8,
+  },
+
+  input: {
+    height: 52,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: Colors.text,
+    backgroundColor: Colors.white,
+    marginBottom: 15,
+  },
+
+  statsContainer: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 18,
+  },
+
+  statCard: {
+    flex: 1,
+    backgroundColor: Colors.card,
+    borderRadius: 15,
+    padding: 20,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+
+  statNumber: {
+    fontSize: 30,
+    fontWeight: "800",
+    color: Colors.primary,
+  },
+
+  statLabel: {
+    marginTop: 5,
+    color: Colors.textLight,
+    fontSize: 14,
+  },
 });
