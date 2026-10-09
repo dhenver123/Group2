@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 
-import Header from "../components/Header";
+import Header from "../components/Panel";
 import CustomButton from "../components/CustomButton";
 import MissionCard from "../components/Screen";
 import Colors from "../constants/Colors";
