@@ -1,197 +1,664 @@
-import React, { useState } from "react";
+import React from 'react';
+
 import {
-  View,
-  Text,
-  TextInput,
+  Pressable,
   StyleSheet,
-  ScrollView,
-} from "react-native";
-import { router } from "expo-router";
+  Text,
+  View,
+} from 'react-native';
 
-import Header from "../components/Panel";
-import CustomButton from "../components/BottomNav";
-import Colors from "../constants/Colors";
-import { useMissions } from "../context/MissionContext";
+import { useRouter } from 'expo-router';
 
-export default function HomeScreen() {
+import Screen from '../components/Screen';
+import Panel from '../components/Panel';
+import BottomNav from '../components/BottomNav';
+
+import { useApp } from '../context/AppContext';
+
+export default function Home() {
+  const router = useRouter();
+
   const {
-    studentName,
-    setStudentName,
-    totalMissions,
-    completedMissions,
-  } = useMissions();
+    profile,
+    todayMissions,
+    completedToday,
+    todayProgress,
+    streak,
+    xp,
+    level,
+    darkMode,
+  } = useApp();
 
-  const [nameInput, setNameInput] = useState(
-    studentName === "Student" ? "" : studentName
-  );
-
-  const startStudyDay = () => {
-    const trimmedName = nameInput.trim();
-
-    if (trimmedName.length > 0) {
-      setStudentName(trimmedName);
-    }
-
-    router.push("/tasks");
-  };
+  const dateText =
+    new Intl.DateTimeFormat(
+      'en-US',
+      {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+      }
+    ).format(new Date());
 
   return (
-    <ScrollView
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
+    <View
+      style={[
+        styles.root,
+        darkMode && styles.darkRoot,
+      ]}
     >
-      <View style={styles.hero}>
-        <Text style={styles.emoji}>📚</Text>
+      <Screen>
+        <View style={styles.header}>
+          <View>
+            <Text
+              style={[
+                styles.kicker,
+                darkMode &&
+                  styles.darkMuted,
+              ]}
+            >
+              STUDENT DAILY MISSION
+            </Text>
 
-        <Text style={styles.title}>
-          Student Daily Mission
-        </Text>
+            <Text
+              style={[
+                styles.greeting,
+                darkMode &&
+                  styles.darkText,
+              ]}
+            >
+              Good evening,{' '}
+              {profile.name ||
+                'Student'} 👋
+            </Text>
 
-        <Text style={styles.subtitle}>
-          Organize your study day, complete your missions,
-          and track your progress.
-        </Text>
-      </View>
+            <Text
+              style={[
+                styles.date,
+                darkMode &&
+                  styles.darkMuted,
+              ]}
+            >
+              {dateText}
+            </Text>
+          </View>
 
-      <View style={styles.card}>
-        <Header
-          title="Welcome!"
-          subtitle="Enter your name to begin your study day."
-        />
-
-        <Text style={styles.label}>Your Name</Text>
-
-        <TextInput
-          value={nameInput}
-          onChangeText={setNameInput}
-          placeholder="Enter your name"
-          placeholderTextColor={Colors.textLight}
-          style={styles.input}
-        />
-
-        <CustomButton
-          title="Start My Study Day"
-          onPress={startStudyDay}
-        />
-      </View>
-
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>
-            {totalMissions}
-          </Text>
-          <Text style={styles.statLabel}>Missions</Text>
+          <Pressable
+            onPress={() =>
+              router.push(
+                '/profile' as never
+              )
+            }
+            style={styles.avatar}
+          >
+            <Text style={styles.avatarText}>
+              {(
+                profile.name ||
+                'S'
+              )
+                .charAt(0)
+                .toUpperCase()}
+            </Text>
+          </Pressable>
         </View>
 
-        <View style={styles.statCard}>
-          <Text style={styles.statNumber}>
-            {completedMissions}
-          </Text>
-          <Text style={styles.statLabel}>Completed</Text>
+        <View style={styles.hero}>
+          <View style={styles.heroTop}>
+            <View>
+              <Text style={styles.heroLabel}>
+                TODAY'S MISSION
+              </Text>
+
+              <Text style={styles.heroTitle}>
+                Make today count.
+              </Text>
+            </View>
+
+            <Text style={styles.heroPercent}>
+              {todayProgress}%
+            </Text>
+          </View>
+
+          <View
+            style={styles.progressTrack}
+          >
+            <View
+              style={[
+                styles.progressFill,
+                {
+                  width: `${todayProgress}%`,
+                },
+              ]}
+            />
+          </View>
+
+          <View
+            style={styles.heroBottom}
+          >
+            <Text
+              style={styles.heroSmall}
+            >
+              {completedToday} of{' '}
+              {todayMissions.length}{' '}
+              missions complete
+            </Text>
+
+            <Text
+              style={styles.heroSmall}
+            >
+              Level {level}
+            </Text>
+          </View>
         </View>
-      </View>
 
-      <CustomButton
-        title="My Profile"
-        variant="secondary"
-        onPress={() => router.push("/profile")}
-      />
+        <View style={styles.statsRow}>
+          <StatCard
+            value={`${streak}`}
+            label="Day streak"
+            icon="🔥"
+            darkMode={darkMode}
+          />
 
-      <CustomButton
-        title="Daily Study Tips"
-        variant="secondary"
-        onPress={() => router.push("/tips")}
-      />
-    </ScrollView>
+          <StatCard
+            value={`${xp}`}
+            label="Total XP"
+            icon="⚡"
+            darkMode={darkMode}
+          />
+
+          <StatCard
+            value={`${todayMissions.length}`}
+            label="Today"
+            icon="✦"
+            darkMode={darkMode}
+          />
+        </View>
+
+        <View style={styles.sectionHeader}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              darkMode &&
+                styles.darkText,
+            ]}
+          >
+            Your focus
+          </Text>
+
+          <Pressable
+            onPress={() =>
+              router.push(
+                '/missions' as never
+              )
+            }
+          >
+            <Text style={styles.link}>
+              See all
+            </Text>
+          </Pressable>
+        </View>
+
+        {todayMissions
+          .slice(0, 3)
+          .map((mission) => (
+            <Pressable
+              key={mission.id}
+              onPress={() =>
+                router.push(
+                  '/missions' as never
+                )
+              }
+            >
+              <Panel>
+                <View
+                  style={styles.missionRow}
+                >
+                  <View
+                    style={[
+                      styles.dot,
+                      mission.completed &&
+                        styles.doneDot,
+                    ]}
+                  >
+                    <Text
+                      style={
+                        styles.dotText
+                      }
+                    >
+                      {mission.completed
+                        ? '✓'
+                        : '○'}
+                    </Text>
+                  </View>
+
+                  <View
+                    style={
+                      styles.missionInfo
+                    }
+                  >
+                    <Text
+                      style={[
+                        styles.missionTitle,
+                        mission.completed &&
+                          styles.completed,
+                        darkMode &&
+                          styles.darkText,
+                      ]}
+                    >
+                      {mission.title}
+                    </Text>
+
+                    <Text
+                      style={
+                        styles.missionMeta
+                      }
+                    >
+                      {mission.category}
+                      {' · '}
+                      {mission.priority}{' '}
+                      priority
+                    </Text>
+                  </View>
+                </View>
+              </Panel>
+            </Pressable>
+          ))}
+
+        {todayMissions.length === 0 && (
+          <Panel>
+            <Text
+              style={[
+                styles.emptyTitle,
+                darkMode &&
+                  styles.darkText,
+              ]}
+            >
+              No missions yet.
+            </Text>
+
+            <Text
+              style={
+                styles.missionMeta
+              }
+            >
+              Add your first mission
+              and start your streak.
+            </Text>
+          </Panel>
+        )}
+
+        <View style={styles.sectionHeader}>
+          <Text
+            style={[
+              styles.sectionTitle,
+              darkMode &&
+                styles.darkText,
+            ]}
+          >
+            Quick actions
+          </Text>
+        </View>
+
+        <View style={styles.quickRow}>
+          <Pressable
+            onPress={() =>
+              router.push(
+                '/missions' as never
+              )
+            }
+            style={styles.quickCard}
+          >
+            <Text
+              style={styles.quickIcon}
+            >
+              ＋
+            </Text>
+
+            <Text
+              style={styles.quickTitle}
+            >
+              Add mission
+            </Text>
+
+            <Text
+              style={styles.quickSub}
+            >
+              Plan your next task
+            </Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() =>
+              router.push(
+                '/progress' as never
+              )
+            }
+            style={styles.quickCard}
+          >
+            <Text
+              style={styles.quickIcon}
+            >
+              ↗
+            </Text>
+
+            <Text
+              style={styles.quickTitle}
+            >
+              View progress
+            </Text>
+
+            <Text
+              style={styles.quickSub}
+            >
+              Check your stats
+            </Text>
+          </Pressable>
+        </View>
+      </Screen>
+
+      <BottomNav />
+    </View>
+  );
+}
+
+function StatCard({
+  value,
+  label,
+  icon,
+  darkMode,
+}: {
+  value: string;
+  label: string;
+  icon: string;
+  darkMode: boolean;
+}) {
+  return (
+    <View
+      style={[
+        styles.statCard,
+        darkMode &&
+          styles.darkCard,
+      ]}
+    >
+      <Text style={styles.statIcon}>
+        {icon}
+      </Text>
+
+      <Text
+        style={[
+          styles.statValue,
+          darkMode &&
+            styles.darkText,
+        ]}
+      >
+        {value}
+      </Text>
+
+      <Text
+        style={styles.statLabel}
+      >
+        {label}
+      </Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: Colors.background,
-    padding: 20,
-    paddingTop: 60,
+  root: {
+    flex: 1,
+    backgroundColor: '#F6F7FB',
+  },
+
+  darkRoot: {
+    backgroundColor: '#0D1020',
+  },
+
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 22,
+  },
+
+  kicker: {
+    color: '#8A8DA0',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 1.4,
+    marginBottom: 5,
+  },
+
+  greeting: {
+    color: '#16182A',
+    fontSize: 24,
+    fontWeight: '900',
+  },
+
+  date: {
+    color: '#8A8DA0',
+    marginTop: 4,
+    fontSize: 13,
+  },
+
+  darkText: {
+    color: '#F7F7FB',
+  },
+
+  darkMuted: {
+    color: '#9A9DB0',
+  },
+
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 17,
+    backgroundColor: '#E8E2FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  avatarText: {
+    color: '#6C4DE6',
+    fontWeight: '900',
+    fontSize: 18,
   },
 
   hero: {
-    alignItems: "center",
-    marginBottom: 30,
+    backgroundColor: '#17182C',
+    borderRadius: 28,
+    padding: 22,
+    marginBottom: 16,
   },
 
-  emoji: {
-    fontSize: 56,
-    marginBottom: 12,
+  heroTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
-  title: {
+  heroLabel: {
+    color: '#B9B0FF',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+  },
+
+  heroTitle: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '900',
+    marginTop: 5,
+  },
+
+  heroPercent: {
+    color: '#FFFFFF',
     fontSize: 30,
-    fontWeight: "800",
-    color: Colors.text,
-    textAlign: "center",
+    fontWeight: '900',
   },
 
-  subtitle: {
-    fontSize: 16,
-    color: Colors.textLight,
-    textAlign: "center",
-    lineHeight: 24,
+  progressTrack: {
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#30334B',
+    marginTop: 22,
+    overflow: 'hidden',
+  },
+
+  progressFill: {
+    height: '100%',
+    borderRadius: 5,
+    backgroundColor: '#8D72FF',
+  },
+
+  heroBottom: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 10,
   },
 
-  card: {
-    backgroundColor: Colors.card,
-    borderRadius: 18,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    marginBottom: 18,
+  heroSmall: {
+    color: '#A7A9BA',
+    fontSize: 12,
+    fontWeight: '700',
   },
 
-  label: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: Colors.text,
-    marginBottom: 8,
-  },
-
-  input: {
-    height: 52,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    color: Colors.text,
-    backgroundColor: Colors.white,
-    marginBottom: 15,
-  },
-
-  statsContainer: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 18,
+  statsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 24,
   },
 
   statCard: {
     flex: 1,
-    backgroundColor: Colors.card,
-    borderRadius: 15,
-    padding: 20,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: Colors.border,
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    padding: 15,
+    minHeight: 110,
   },
 
-  statNumber: {
-    fontSize: 30,
-    fontWeight: "800",
-    color: Colors.primary,
+  darkCard: {
+    backgroundColor: '#171A2E',
+  },
+
+  statIcon: {
+    fontSize: 19,
+    marginBottom: 10,
+  },
+
+  statValue: {
+    color: '#17182C',
+    fontSize: 22,
+    fontWeight: '900',
   },
 
   statLabel: {
-    marginTop: 5,
-    color: Colors.textLight,
+    color: '#8A8DA0',
+    fontSize: 11,
+    marginTop: 3,
+    fontWeight: '700',
+  },
+
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  sectionTitle: {
+    color: '#17182C',
+    fontSize: 18,
+    fontWeight: '900',
+  },
+
+  link: {
+    color: '#6C4DE6',
+    fontWeight: '800',
+    fontSize: 13,
+  },
+
+  missionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  dot: {
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: '#F0EEFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 13,
+  },
+
+  doneDot: {
+    backgroundColor: '#DDF7EA',
+  },
+
+  dotText: {
+    color: '#6C4DE6',
+    fontSize: 18,
+    fontWeight: '900',
+  },
+
+  missionInfo: {
+    flex: 1,
+  },
+
+  missionTitle: {
+    color: '#202236',
     fontSize: 14,
+    fontWeight: '800',
+  },
+
+  completed: {
+    textDecorationLine: 'line-through',
+    color: '#9093A2',
+  },
+
+  missionMeta: {
+    color: '#9295A5',
+    fontSize: 11,
+    marginTop: 5,
+    fontWeight: '600',
+  },
+
+  emptyTitle: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#17182C',
+    marginBottom: 5,
+  },
+
+  quickRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+
+  quickCard: {
+    flex: 1,
+    backgroundColor: '#EDE9FF',
+    borderRadius: 22,
+    padding: 17,
+    minHeight: 125,
+  },
+
+  quickIcon: {
+    color: '#6C4DE6',
+    fontSize: 24,
+    fontWeight: '900',
+  },
+
+  quickTitle: {
+    color: '#2A2351',
+    fontSize: 14,
+    fontWeight: '900',
+    marginTop: 15,
+  },
+
+  quickSub: {
+    color: '#746C95',
+    fontSize: 11,
+    marginTop: 4,
   },
 });
