@@ -10,7 +10,7 @@ import { router } from "expo-router";
 
 import Header from "../components/Header";
 import CustomButton from "../components/CustomButton";
-import MissionCard from "../components/MissionCard";
+import MissionCard from "../components/Screen";
 import Colors from "../constants/Colors";
 import { useMissions } from "../context/MissionContext";
 
