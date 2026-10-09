@@ -8,7 +8,7 @@ import {
 import { router } from "expo-router";
 
 import Header from "../components/Panel";
-import CustomButton from "../components/CustomButton";
+import CustomButton from "../components/BottomNav";
 import Colors from "../constants/Colors";
 import { useMissions } from "../context/MissionContext";
 
